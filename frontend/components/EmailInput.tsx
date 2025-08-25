@@ -263,7 +263,9 @@ export const EmailInput = ({ onSubmit, isLoading, hasResult, onReset }: { onSubm
                 cursor: (isLoading || (!!validationMessage && !isTyping)) ? 'not-allowed' : 'pointer',
                 opacity: (isLoading || (!!validationMessage && !isTyping)) ? 0.7 : 1,
                 border: 'none',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation'
               }}
               onMouseOver={(e) => {
                 if (!isLoading && !validationMessage) {
@@ -275,6 +277,20 @@ export const EmailInput = ({ onSubmit, isLoading, hasResult, onReset }: { onSubm
                 if (!isLoading && !validationMessage) {
                   e.currentTarget.style.background = 'linear-gradient(to right, #4ade80, #10b981)';
                   e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(16, 185, 129, 0.3)';
+                }
+              }}
+              onTouchStart={(e) => {
+                if (!isLoading && !validationMessage) {
+                  e.currentTarget.style.background = 'linear-gradient(to right, #10b981, #059669)';
+                  e.currentTarget.style.boxShadow = '0 15px 20px -3px rgba(16, 185, 129, 0.4)';
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }
+              }}
+              onTouchEnd={(e) => {
+                if (!isLoading && !validationMessage) {
+                  e.currentTarget.style.background = 'linear-gradient(to right, #4ade80, #10b981)';
+                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(16, 185, 129, 0.3)';
+                  e.currentTarget.style.transform = 'scale(1)';
                 }
               }}
             >
