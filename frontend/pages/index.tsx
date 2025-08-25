@@ -189,7 +189,8 @@ export default function Home() {
     } catch (err) {
       console.error('Error analyzing email:', err);
       console.error('Full error details:', err);
-      setError(`Failed to analyze email: ${err.message || err}`);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to analyze email: ${errorMessage}`);
       console.log('Error state set');
     } finally {
       console.log('Setting isAnalyzing to false...');
