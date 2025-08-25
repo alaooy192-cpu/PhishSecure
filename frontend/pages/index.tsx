@@ -180,6 +180,7 @@ export default function Home() {
     
     try {
       console.log('Calling analyzeEmail with:', email);
+      console.log('Current URL:', window.location.href);
       const result = await analyzeEmail(email);
       console.log('Analysis result received:', result);
       console.log('Setting analysis result in state...');
@@ -187,7 +188,8 @@ export default function Home() {
       console.log('Analysis result set in state');
     } catch (err) {
       console.error('Error analyzing email:', err);
-      setError('Failed to analyze email. Please try again.');
+      console.error('Full error details:', err);
+      setError(`Failed to analyze email: ${err.message || err}`);
       console.log('Error state set');
     } finally {
       console.log('Setting isAnalyzing to false...');
@@ -583,7 +585,7 @@ export default function Home() {
           textAlign: 'center',
           gap: '0.25rem'
         }}>
-          <span>© 2023 PhishSecure. Developed with 💙 by</span>
+          <span> 2023 PhishSecure. Developed with by</span>
           <a 
             href="https://linkedin.com/in/wxmohd" 
             target="_blank" 
