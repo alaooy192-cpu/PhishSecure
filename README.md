@@ -6,7 +6,6 @@ A web-based application that uses AI-powered machine learning to detect phishing
 
 ## 🚀 Live Demo
 🌐 [Visit the app on Vercel]  
-🔗 [API deployed on Render]
 
 ---
 
