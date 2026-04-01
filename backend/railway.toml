@@ -1,0 +1,15 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[env]
+FLASK_ENV = "production"
+AUTO_START_MONITORING = "true"
+DEBUG = "false"
+HIGH_THREAT_THRESHOLD = "70"
+HIGH_BAHRAIN_RELEVANCE_THRESHOLD = "60"
+PORT = "5000"

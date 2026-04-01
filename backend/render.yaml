@@ -1,0 +1,24 @@
+# Render.com deployment configuration for PhishSecure Bahrain CTI Backend
+services:
+  - type: web
+    name: phishsecure-bahrain-cti-api
+    env: python
+    buildCommand: pip install -r requirements_cti.txt
+    startCommand: python app_cti.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/cti_database.db
+      - key: AUTO_START_MONITORING
+        value: true
+      - key: DEBUG
+        value: false
+      - key: HIGH_THREAT_THRESHOLD
+        value: 70
+      - key: HIGH_BAHRAIN_RELEVANCE_THRESHOLD
+        value: 60
+    disk:
+      name: cti-database
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

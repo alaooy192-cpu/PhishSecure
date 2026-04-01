@@ -48,7 +48,7 @@ HOMOGLYPHS = {
     'z': ['ż', 'ź', 'ž', 'ẓ']
 }
 
-# Suspicious keywords commonly used in phishing domains
+# Suspicious keywords commonly used in phishing domains (removed overly common words)
 SUSPICIOUS_KEYWORDS = [
     'login', 'signin', 'sign-in', 'logon', 'log-on',
     'secure', 'security', 'verify', 'verification', 'validate', 'validation',
@@ -58,7 +58,7 @@ SUSPICIOUS_KEYWORDS = [
     'alert', 'warning', 'urgent', 'immediate', 'action', 'required',
     'billing', 'invoice', 'payment', 'pay', 'wallet', 'bank', 'banking',
     'support', 'help', 'helpdesk', 'service', 'customer', 'client',
-    'webmail', 'mail', 'email', 'inbox',
+    'webmail', 'inbox',
     'online', 'web', 'portal', 'access', 'member', 'user'
 ]
 
@@ -458,7 +458,7 @@ def extract_flags(email_content):
     return flags
 
 def predict_phishing(email_content):
-    """Predict if an email is phishing based on its domain"""
+    """Predict if an email is phishing based on its domain with threat intelligence"""
     # Try to extract email address from content
     email_match = re.search(r'[\w\.-]+@([\w\.-]+)', email_content)
     
@@ -479,11 +479,18 @@ def predict_phishing(email_content):
     for brand in popular_brands:
         if brand in domain_without_tld.lower() and any(char.isdigit() for char in domain_without_tld):
             # Direct detection of brand name with numbers - highly suspicious pattern
-            return {
+            base_result = {
                 "verdict": "phishing",
                 "confidence": 30,  # Lower confidence score for phishing (more certain it's phishing)
                 "flags": [f"Suspicious domain: contains '{brand}' with numbers (common phishing tactic)"]
             }
+            # Enrich with threat intelligence
+            try:
+                from services.threat_intel import threat_intel_service
+                return threat_intel_service.enrich_analysis(domain, base_result)
+            except ImportError:
+                # Fallback if threat intel not available
+                return base_result
     
     # Extract features
     features = extract_domain_features(domain)
@@ -493,7 +500,13 @@ def predict_phishing(email_content):
     
     if model is None or tokenizer is None:
         # Fallback to rule-based approach if model loading fails
-        return predict_phishing_rule_based(domain, features)
+        base_result = predict_phishing_rule_based(domain, features)
+        # Enrich with threat intelligence
+        try:
+            from services.threat_intel import threat_intel_service
+            return threat_intel_service.enrich_analysis(domain, base_result)
+        except ImportError:
+            return base_result
     
     try:
         # Transform domain using tokenizer
@@ -515,9 +528,9 @@ def predict_phishing(email_content):
         if features['suffix'] in suspicious_tlds:
             phishing_score = max(phishing_score, 70)  # Boost score if suspicious TLD
         
-        # Determine verdict based on threshold (60% or below)
-        # If phishing_score is 60% or below, it should be classified as phishing
-        is_phishing = phishing_score <= 60
+        # Determine verdict based on threshold (60% or above)
+        # If phishing_score is 60% or above, it should be classified as phishing
+        is_phishing = phishing_score >= 60
         
         # Extract flags
         flags = extract_flags(email_content)
@@ -525,21 +538,33 @@ def predict_phishing(email_content):
         # Print debug info
         print(f"[DEBUG] Domain: {domain}, Score: {phishing_score:.2f}%, Verdict: {'phishing' if is_phishing else 'legitimate'}")
         
-        # For phishing emails (score <= 60%), confidence is 100 - phishing_score
-        # For legitimate emails (score > 60%), confidence is phishing_score
-        # This way, lower confidence for phishing means more certain it's phishing
-        confidence = round(100 - phishing_score if is_phishing else phishing_score, 2)
+        # For phishing emails (score >= 60%), confidence is phishing_score
+        # For legitimate emails (score < 60%), confidence is 100 - phishing_score
+        confidence = round(phishing_score if is_phishing else (100 - phishing_score), 2)
         
-        return {
+        base_result = {
             "verdict": "phishing" if is_phishing else "legitimate",
             "confidence": confidence,
             "flags": flags
         }
         
+        # Enrich with threat intelligence
+        try:
+            from services.threat_intel import threat_intel_service
+            return threat_intel_service.enrich_analysis(domain, base_result)
+        except ImportError:
+            return base_result
+        
     except Exception as e:
         print(f"Error during prediction: {e}")
         # Fallback to rule-based approach
-        return predict_phishing_rule_based(domain, features)
+        base_result = predict_phishing_rule_based(domain, features)
+        # Enrich with threat intelligence
+        try:
+            from services.threat_intel import threat_intel_service
+            return threat_intel_service.enrich_analysis(domain, base_result)
+        except ImportError:
+            return base_result
 
 def predict_phishing_rule_based(domain, features):
     """Enhanced rule-based prediction with smarter heuristics"""
@@ -656,17 +681,24 @@ def predict_phishing_rule_based(domain, features):
     # Extract flags
     flags = extract_flags(f"@{domain}")
     
-    # Determine verdict based on threshold (60% or below)
-    is_phishing = phishing_score <= 60
+    # Determine verdict based on threshold (60% or above)
+    is_phishing = phishing_score >= 60
     
     # Calculate confidence
-    confidence = round(100 - phishing_score if is_phishing else phishing_score, 2)
+    confidence = round(phishing_score if is_phishing else (100 - phishing_score), 2)
     
     # Print debug info
     print(f"[DEBUG] Rule-based - Domain: {domain}, Score: {phishing_score:.2f}%, Verdict: {'phishing' if is_phishing else 'legitimate'}, Confidence: {confidence}%")
     
-    return {
+    base_result = {
         "verdict": "phishing" if is_phishing else "legitimate",
         "confidence": confidence,
         "flags": flags
     }
+    
+    # Enrich with threat intelligence
+    try:
+        from services.threat_intel import threat_intel_service
+        return threat_intel_service.enrich_analysis(domain, base_result)
+    except ImportError:
+        return base_result
