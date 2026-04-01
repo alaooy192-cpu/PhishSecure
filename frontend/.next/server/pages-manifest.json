@@ -2,5 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js"
+  "/": "pages/index.js",
+  "/cti-dashboard": "pages/cti-dashboard.js",
+  "/indicators": "pages/indicators.js",
+  "/analyze": "pages/analyze.js"
 }

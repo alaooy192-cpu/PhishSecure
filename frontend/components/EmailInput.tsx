@@ -59,6 +59,16 @@ export const EmailInput = ({ onSubmit, isLoading, hasResult, onReset }: { onSubm
     };
   }, [typingTimer]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Enter (without Shift)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (email.trim() && !isLoading && !validationMessage) {
+        onSubmit(email);
+      }
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -122,6 +132,7 @@ export const EmailInput = ({ onSubmit, isLoading, hasResult, onReset }: { onSubm
                 id="email-input"
                 value={email}
                 onChange={handleEmailChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Enter the email address (e.g., example@domain.com)..."
                 disabled={hasResult && !isLoading}
                 style={{
