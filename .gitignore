@@ -1,7 +1,5 @@
-# Ignore other model files, but keep ours
-!backend/model/phishing_lstm_model.h5
-!backend/model/tokenizer.pickle
-
+# Ignore database files
+*.db
 
 # Ignore tokenizers / encoders
 *.pickle

@@ -84,7 +84,6 @@ export default function CTIDashboard() {
   const triggerCollection = async () => {
     setCollecting(true);
     try {
-      await fetch(`${CTI_API_BASE}/api/seed`, { method: 'POST' });
       await fetch(`${CTI_API_BASE}/api/collection/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

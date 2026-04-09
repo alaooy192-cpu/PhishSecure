@@ -10,7 +10,7 @@ class Config:
     DATABASE_PATH = os.getenv('DATABASE_PATH', './cti_database.db')
     
     # Demo mode (generates sample data if no real sources available)
-    USE_DEMO_DATA = os.getenv('USE_DEMO_DATA', 'true').lower() == 'true'
+    USE_DEMO_DATA = os.getenv('USE_DEMO_DATA', 'false').lower() == 'true'
     
     # Threat collection settings
     COLLECTION_INTERVAL_HOURS = int(os.getenv('COLLECTION_INTERVAL_HOURS', '6'))
