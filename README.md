@@ -27,7 +27,7 @@ Flask API (app_cti.py on Render :5000)
 
 ### Root
 ```
-PhishSecure-4/
+PhishSecure/
 ├── README.md                  # This file
 ├── .gitignore                 # Ignores *.db, *.pickle, venv, node_modules, .env
 ├── package.json               # Root-level package.json (Next.js workspace helper)
