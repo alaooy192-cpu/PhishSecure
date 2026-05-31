@@ -30,8 +30,8 @@ class ContinuousThreatMonitor:
     
     def __init__(self, config):
         self.config = config
-        self.db_manager = DatabaseManager()
-        self.threat_collector = ThreatCollector(config)
+        self.db_manager = DatabaseManager(getattr(config, 'DATABASE_PATH', 'cti_database.db'))
+        self.threat_collector = ThreatCollector(getattr(config, 'DATABASE_PATH', 'cti_database.db'))
         self.bahrain_scorer = BahrainRelevanceScorer()
         self.threat_analyzer = ThreatAnalyzer()
         

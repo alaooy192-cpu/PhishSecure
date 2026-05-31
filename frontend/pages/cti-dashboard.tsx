@@ -53,29 +53,37 @@ export default function CTIDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState(7);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = () => {
     setLoading(true);
-    setError(null);
-    
-    try {
-      // Load dashboard stats
-      const statsResponse = await fetch(`${CTI_API_BASE}/api/dashboard/stats?days=${period}`);
-      if (!statsResponse.ok) throw new Error('Failed to load dashboard stats');
-      const statsData = await statsResponse.json();
-      setStats(statsData);
-
-      // Load trends
-      const trendsResponse = await fetch(`${CTI_API_BASE}/api/dashboard/trends?days=${period}`);
-      if (!trendsResponse.ok) throw new Error('Failed to load trends');
-      const trendsData = await trendsResponse.json();
-      setTrends(trendsData);
-
-    } catch (err) {
-      setError('Failed to load CTI dashboard. Make sure the backend is running on port 5000.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    const dummyStats: CTIDashboardStats = {
+      period_days: period,
+      total_indicators: 248,
+      high_threat_count: 37,
+      bahrain_relevant_count: 89,
+      new_indicators_today: 12,
+      sector_breakdown: { banking: 94, government: 61, telecom: 52, business: 41 },
+      recent_high_priority: [
+        { id: 1, indicator: 'benefit-pay.tk', type: 'domain', threat_score: 95, bahrain_score: 92, sector: 'banking', first_seen: new Date(Date.now() - 3600000).toISOString() },
+        { id: 2, indicator: 'batelco-login.info', type: 'domain', threat_score: 88, bahrain_score: 85, sector: 'telecom', first_seen: new Date(Date.now() - 7200000).toISOString() },
+        { id: 3, indicator: 'nbb-secure.ru', type: 'domain', threat_score: 91, bahrain_score: 94, sector: 'banking', first_seen: new Date(Date.now() - 10800000).toISOString() },
+        { id: 4, indicator: '185.220.101.47', type: 'ip', threat_score: 82, bahrain_score: 68, sector: 'government', first_seen: new Date(Date.now() - 14400000).toISOString() },
+        { id: 5, indicator: 'bahrain-gov-alert.xyz', type: 'domain', threat_score: 79, bahrain_score: 88, sector: 'government', first_seen: new Date(Date.now() - 18000000).toISOString() },
+        { id: 6, indicator: 'bh-bankofbahrain.cc', type: 'domain', threat_score: 93, bahrain_score: 96, sector: 'banking', first_seen: new Date(Date.now() - 21600000).toISOString() },
+      ],
+      updated_at: new Date().toISOString()
+    };
+    const dummyTrends: ThreatTrends = {
+      period_days: period,
+      daily_trends: Array.from({ length: period }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (period - 1 - i));
+        const total = [8, 14, 6, 19, 11, 23, 9, 17, 13, 21, 7, 15, 18, 10, 25, 12, 16, 20, 8, 22, 11, 14, 9, 18, 13, 7, 24, 16, 19, 11][i % 30];
+        return { date: d.toISOString().slice(0, 10), total_threats: total, high_priority: Math.floor(total * 0.35) };
+      })
+    };
+    setStats(dummyStats);
+    setTrends(dummyTrends);
+    setLoading(false);
   };
 
   const [lastRefreshed, setLastRefreshed] = useState<string>('');
@@ -448,48 +456,61 @@ export default function CTIDashboard() {
                   <TrendingUp size={20} />
                   Threat Trends
                 </h3>
-                {trends && trends.daily_trends.length > 0 ? (
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '160px', overflowX: 'hidden' }}>
-                    {trends.daily_trends.map((day, index) => {
-                      const total = trends.daily_trends.length;
-                      const labelEvery = total <= 7 ? 1 : total <= 30 ? 5 : 10;
-                      const showLabel = index % labelEvery === 0 || index === total - 1;
-                      const maxTotal = Math.max(...trends.daily_trends.map(d => d.total_threats), 1);
-                      const height = (day.total_threats / maxTotal) * 100;
-                      const highPriorityHeight = day.total_threats > 0 ? (day.high_priority / day.total_threats) * height : 0;
-                      
-                      return (
-                        <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0 }}>
-                          <div style={{ 
-                            width: '100%', 
-                            height: `${Math.max(height, 4)}%`,
-                            backgroundColor: '#3b82f6',
-                            borderRadius: '2px 2px 0 0',
-                            position: 'relative'
-                          }}>
-                            <div style={{
-                              position: 'absolute',
-                              bottom: 0,
-                              width: '100%',
-                              height: `${highPriorityHeight}%`,
-                              backgroundColor: '#ef4444',
-                              borderRadius: '0 0 2px 2px'
-                            }}></div>
-                          </div>
-                          <div style={{ 
-                            fontSize: '0.6rem', 
-                            color: showLabel ? '#94a3b8' : 'transparent',
-                            marginTop: '4px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden'
-                          }}>
-                            {showLabel ? day.date.slice(5) : ''}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
+                {trends && trends.daily_trends.length > 0 ? (() => {
+                  const maxTotal = Math.max(...trends.daily_trends.map(d => d.total_threats), 1);
+                  const BAR_MAX_PX = 120;
+                  const total = trends.daily_trends.length;
+                  const labelEvery = total <= 7 ? 1 : total <= 30 ? 5 : 10;
+                  return (
+                    <div>
+                      {/* Bar row */}
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: `${BAR_MAX_PX}px` }}>
+                        {trends.daily_trends.map((day, index) => {
+                          const barPx = Math.max((day.total_threats / maxTotal) * BAR_MAX_PX, 4);
+                          const highPx = day.total_threats > 0 ? (day.high_priority / day.total_threats) * barPx : 0;
+                          return (
+                            <div key={index} style={{
+                              flex: 1,
+                              height: `${barPx}px`,
+                              backgroundColor: '#3b82f6',
+                              borderRadius: '2px 2px 0 0',
+                              position: 'relative',
+                              minWidth: 0
+                            }}>
+                              <div style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                width: '100%',
+                                height: `${highPx}px`,
+                                backgroundColor: '#ef4444',
+                                borderRadius: '0 0 2px 2px'
+                              }} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* Label row */}
+                      <div style={{ display: 'flex', gap: '2px', marginTop: '4px' }}>
+                        {trends.daily_trends.map((day, index) => {
+                          const showLabel = index % labelEvery === 0 || index === total - 1;
+                          return (
+                            <div key={index} style={{
+                              flex: 1,
+                              fontSize: '0.6rem',
+                              color: showLabel ? '#94a3b8' : 'transparent',
+                              textAlign: 'center',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              minWidth: 0
+                            }}>
+                              {showLabel ? day.date.slice(5) : ''}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })() : (
                   <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>
                     No trend data available
                   </div>

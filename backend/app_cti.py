@@ -3,6 +3,9 @@ PhishSecure Bahrain CTI Platform - Main Flask Application
 Cyber Threat Intelligence platform focused on phishing threats relevant to Bahrain
 """
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os

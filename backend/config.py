@@ -24,10 +24,10 @@ class Config:
     DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
     
     # Threat Intelligence API Keys (for accurate live results)
-    VIRUSTOTAL_API_KEY = os.getenv('VIRUSTOTAL_API_KEY')
-    ABUSEIPDB_API_KEY = os.getenv('ABUSEIPDB_API_KEY', 'd227e1dd1a60592c3128bf72fe60469259a420798d80feea47b2fd07be3fccfbc8fffd323bd98d19')
-    OTX_API_KEY = os.getenv('OTX_API_KEY')
-    CENSYS_API_KEY = os.getenv('CENSYS_API_KEY', 'censys_eVCj1dw9_MbHjv34t3eyD9Q7SGdrYjy4N')
+    VIRUSTOTAL_API_KEY = os.getenv('VIRUSTOTAL_API_KEY', '')
+    ABUSEIPDB_API_KEY = os.getenv('ABUSEIPDB_API_KEY', '')
+    OTX_API_KEY = os.getenv('OTX_API_KEY', '')
+    CENSYS_API_KEY = os.getenv('CENSYS_API_KEY', '')
     
     # Continuous monitoring settings
     AUTO_START_MONITORING = os.getenv('AUTO_START_MONITORING', 'true').lower() == 'true'

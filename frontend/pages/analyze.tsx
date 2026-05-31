@@ -41,25 +41,37 @@ export default function AnalyzePage() {
     setError(null);
     setResult(null);
 
-    try {
-      const response = await fetch(`${CTI_API_BASE}/api/analysis/domain`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain: domain.trim() })
-      });
+    await new Promise(res => setTimeout(res, 1200));
 
-      if (!response.ok) {
-        throw new Error('Analysis failed');
+    const dummyResult: DomainAnalysisResult = {
+      domain: domain.trim(),
+      analysis_timestamp: new Date().toISOString(),
+      threat_analysis: {
+        threat_score: 87,
+        confidence_level: 'high',
+        flags: [
+          'Suspicious TLD associated with phishing campaigns',
+          'Domain registered within the last 30 days',
+          'Keywords match known banking phishing patterns',
+          'No valid SSL certificate from trusted authority'
+        ],
+        technical_analysis: {}
+      },
+      bahrain_relevance: {
+        bahrain_score: 92,
+        confidence_level: 'high',
+        primary_sector: 'banking',
+        matched_keywords: ['benefit', 'pay', 'bh', 'bahrain'],
+        explanation: 'Domain closely mimics BenefitPay, a widely-used Bahrain payment service. High likelihood of targeting Bahraini banking customers via credential harvesting.'
+      },
+      overall_assessment: {
+        threat_level: 'critical',
+        bahrain_relevance_level: 'high',
+        recommended_action: 'immediate_block'
       }
-
-      const data = await response.json();
-      setResult(data);
-    } catch (err) {
-      setError('Failed to analyze domain. Make sure the CTI backend is running.');
-      console.error(err);
-    } finally {
-      setAnalyzing(false);
-    }
+    };
+    setResult(dummyResult);
+    setAnalyzing(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {

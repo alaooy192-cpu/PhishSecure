@@ -136,46 +136,39 @@ export default function IndicatorsPage() {
 
   const pageSize = 20;
 
-  const loadIndicators = async () => {
+  const ALL_DUMMY_INDICATORS: ThreatIndicator[] = [
+    { id: 1, indicator_type: 'domain', indicator_value: 'benefit-pay.tk', threat_score: 95, bahrain_score: 92, confidence_level: 'high', targeted_sector: 'banking', source: 'PhishTank', first_seen: new Date(Date.now() - 3600000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'bahrain'], status: 'active' },
+    { id: 2, indicator_type: 'domain', indicator_value: 'batelco-login.info', threat_score: 88, bahrain_score: 85, confidence_level: 'high', targeted_sector: 'telecom', source: 'OpenPhish', first_seen: new Date(Date.now() - 7200000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'telecom', 'credential-harvest'], status: 'active' },
+    { id: 3, indicator_type: 'domain', indicator_value: 'nbb-secure.ru', threat_score: 91, bahrain_score: 94, confidence_level: 'high', targeted_sector: 'banking', source: 'MISP', first_seen: new Date(Date.now() - 10800000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'nbb'], status: 'active' },
+    { id: 4, indicator_type: 'ip', indicator_value: '185.220.101.47', threat_score: 82, bahrain_score: 68, confidence_level: 'medium', targeted_sector: 'government', source: 'AbuseIPDB', first_seen: new Date(Date.now() - 14400000).toISOString(), last_updated: new Date().toISOString(), tags: ['malicious-ip', 'c2', 'tor-exit'], status: 'active' },
+    { id: 5, indicator_type: 'domain', indicator_value: 'bahrain-gov-alert.xyz', threat_score: 79, bahrain_score: 88, confidence_level: 'high', targeted_sector: 'government', source: 'PhishTank', first_seen: new Date(Date.now() - 18000000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'government', 'impersonation'], status: 'active' },
+    { id: 6, indicator_type: 'domain', indicator_value: 'bh-bankofbahrain.cc', threat_score: 93, bahrain_score: 96, confidence_level: 'high', targeted_sector: 'banking', source: 'MISP', first_seen: new Date(Date.now() - 21600000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'bob'], status: 'active' },
+    { id: 7, indicator_type: 'url', indicator_value: 'http://bbk-verify.cc/login', threat_score: 86, bahrain_score: 89, confidence_level: 'high', targeted_sector: 'banking', source: 'OpenPhish', first_seen: new Date(Date.now() - 25200000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'bbk', 'login-page'], status: 'active' },
+    { id: 8, indicator_type: 'ip', indicator_value: '91.108.56.130', threat_score: 74, bahrain_score: 55, confidence_level: 'medium', targeted_sector: 'business', source: 'AbuseIPDB', first_seen: new Date(Date.now() - 28800000).toISOString(), last_updated: new Date().toISOString(), tags: ['malicious-ip', 'spam', 'botnet'], status: 'active' },
+    { id: 9, indicator_type: 'domain', indicator_value: 'isa-bahrain-portal.tk', threat_score: 77, bahrain_score: 91, confidence_level: 'high', targeted_sector: 'government', source: 'PhishTank', first_seen: new Date(Date.now() - 32400000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'government', 'isa'], status: 'active' },
+    { id: 10, indicator_type: 'domain', indicator_value: 'viva-bh-account.info', threat_score: 84, bahrain_score: 87, confidence_level: 'high', targeted_sector: 'telecom', source: 'OpenPhish', first_seen: new Date(Date.now() - 36000000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'telecom', 'viva'], status: 'active' },
+    { id: 11, indicator_type: 'url', indicator_value: 'https://ahli-bank-bh.ru/secure', threat_score: 89, bahrain_score: 93, confidence_level: 'high', targeted_sector: 'banking', source: 'MISP', first_seen: new Date(Date.now() - 39600000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'ahli'], status: 'active' },
+    { id: 12, indicator_type: 'ip', indicator_value: '45.142.212.100', threat_score: 71, bahrain_score: 49, confidence_level: 'medium', targeted_sector: 'business', source: 'AbuseIPDB', first_seen: new Date(Date.now() - 43200000).toISOString(), last_updated: new Date().toISOString(), tags: ['malicious-ip', 'phishing-host'], status: 'active' },
+    { id: 13, indicator_type: 'domain', indicator_value: 'bdf-army-bh.xyz', threat_score: 76, bahrain_score: 90, confidence_level: 'medium', targeted_sector: 'government', source: 'PhishTank', first_seen: new Date(Date.now() - 46800000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'government', 'military'], status: 'active' },
+    { id: 14, indicator_type: 'domain', indicator_value: 'zain-bh-offers.cc', threat_score: 81, bahrain_score: 83, confidence_level: 'high', targeted_sector: 'telecom', source: 'OpenPhish', first_seen: new Date(Date.now() - 50400000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'telecom', 'zain'], status: 'active' },
+    { id: 15, indicator_type: 'url', indicator_value: 'http://khaleeji-bank.tk/verify', threat_score: 90, bahrain_score: 85, confidence_level: 'high', targeted_sector: 'banking', source: 'MISP', first_seen: new Date(Date.now() - 54000000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'credential-harvest'], status: 'active' },
+    { id: 16, indicator_type: 'ip', indicator_value: '194.165.16.78', threat_score: 68, bahrain_score: 44, confidence_level: 'low', targeted_sector: 'business', source: 'AbuseIPDB', first_seen: new Date(Date.now() - 57600000).toISOString(), last_updated: new Date().toISOString(), tags: ['malicious-ip', 'scanner'], status: 'monitoring' },
+    { id: 17, indicator_type: 'domain', indicator_value: 'moinfo-bahrain-alert.net', threat_score: 73, bahrain_score: 86, confidence_level: 'medium', targeted_sector: 'government', source: 'PhishTank', first_seen: new Date(Date.now() - 61200000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'government', 'ministry'], status: 'active' },
+    { id: 18, indicator_type: 'domain', indicator_value: 'nbbbahrain-secure.tk', threat_score: 94, bahrain_score: 97, confidence_level: 'high', targeted_sector: 'banking', source: 'MISP', first_seen: new Date(Date.now() - 64800000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'banking', 'nbb', 'critical'], status: 'active' },
+    { id: 19, indicator_type: 'url', indicator_value: 'https://stcbh-account.info/reset', threat_score: 83, bahrain_score: 80, confidence_level: 'high', targeted_sector: 'telecom', source: 'OpenPhish', first_seen: new Date(Date.now() - 68400000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'telecom', 'stc'], status: 'active' },
+    { id: 20, indicator_type: 'domain', indicator_value: 'batelco-prize-bh.xyz', threat_score: 78, bahrain_score: 82, confidence_level: 'medium', targeted_sector: 'telecom', source: 'PhishTank', first_seen: new Date(Date.now() - 72000000).toISOString(), last_updated: new Date().toISOString(), tags: ['phishing', 'telecom', 'social-engineering'], status: 'active' },
+  ];
+
+  const loadIndicators = () => {
     setLoading(true);
-    setError(null);
-    
-    try {
-      const params = new URLSearchParams({
-        limit: pageSize.toString(),
-        offset: ((currentPage - 1) * pageSize).toString()
-      });
-
-      if (typeFilter) params.append('type', typeFilter);
-      if (sectorFilter) params.append('sector', sectorFilter);
-      if (minThreatScore) params.append('min_threat_score', minThreatScore);
-      if (minBahrainScore) params.append('min_bahrain_score', minBahrainScore);
-
-      const response = await fetch(`${CTI_API_BASE}/api/indicators/list?${params}`);
-      if (!response.ok) throw new Error('Failed to load indicators');
-      
-      const data: IndicatorsResponse = await response.json();
-      setIndicators(data.indicators);
-      setTotalCount(data.pagination.total);
-
-    } catch (err) {
-      setError('Failed to load threat indicators. Make sure the CTI backend is running.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    setIndicators(ALL_DUMMY_INDICATORS);
+    setTotalCount(ALL_DUMMY_INDICATORS.length);
+    setLoading(false);
   };
 
-  const loadIndicatorDetails = async (id: number) => {
-    try {
-      const response = await fetch(`${CTI_API_BASE}/api/indicators/${id}`);
-      if (!response.ok) throw new Error('Failed to load indicator details');
-      
-      const data = await response.json();
-      setSelectedIndicator(data);
-    } catch (err) {
-      console.error('Failed to load indicator details:', err);
-    }
+  const loadIndicatorDetails = (id: number) => {
+    const found = ALL_DUMMY_INDICATORS.find(i => i.id === id) || null;
+    setSelectedIndicator(found);
   };
 
   useEffect(() => {
